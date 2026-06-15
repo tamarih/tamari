@@ -4,6 +4,50 @@
 
 let products = [];
 let editingId = null;
+let sortBy = null;        // column key
+let sortDir = "asc";      // "asc" | "desc"
+
+// Map sort key -> function(product) returning sortable value
+const SORT_KEYS = {
+    sku:        p => p.sku || "",
+    name:       p => p.name || "",
+    category:   p => p.category || "",
+    supplier:   p => Number(p.supplier_price) || 0,
+    withVat:    p => calcPrices(p.supplier_price, p.vat_rate, p.margin_rate, p.manual_sale_price).withVat,
+    salePrice:  p => calcPrices(p.supplier_price, p.vat_rate, p.margin_rate, p.manual_sale_price).salePrice,
+    profit:     p => calcPrices(p.supplier_price, p.vat_rate, p.margin_rate, p.manual_sale_price).profit,
+    marginPct:  p => calcPrices(p.supplier_price, p.vat_rate, p.margin_rate, p.manual_sale_price).effectiveMarginPct,
+    stock:      p => p.stock_qty ?? -1,
+};
+
+function toggleSort(key) {
+    if (sortBy === key) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+    } else {
+        sortBy = key;
+        sortDir = "asc";
+    }
+    renderTable();
+}
+window.toggleSort = toggleSort;
+
+function applySort(rows) {
+    if (!sortBy || !SORT_KEYS[sortBy]) return rows;
+    const fn = SORT_KEYS[sortBy];
+    const mult = sortDir === "asc" ? 1 : -1;
+    return [...rows].sort((a, b) => {
+        const va = fn(a), vb = fn(b);
+        if (typeof va === "number" && typeof vb === "number") return (va - vb) * mult;
+        return String(va).localeCompare(String(vb), "he") * mult;
+    });
+}
+
+function sortIcon(key) {
+    if (sortBy !== key) return '<span class="sort-icon">⇅</span>';
+    return sortDir === "asc"
+        ? '<span class="sort-icon active">▲</span>'
+        : '<span class="sort-icon active">▼</span>';
+}
 
 // ---------- Auth ----------
 async function checkAuth() {
@@ -84,25 +128,27 @@ function renderTable() {
         return;
     }
 
+    const sorted = applySort(filtered);
+
     container.innerHTML = `
         <table class="admin-table">
             <thead>
                 <tr>
                     <th>תמונה</th>
-                    <th>מק"ט</th>
-                    <th>שם</th>
-                    <th>קטגוריה</th>
-                    <th>מחיר ספק</th>
-                    <th>+ מע"מ</th>
-                    <th>מחיר מכירה</th>
-                    <th>רווח</th>
-                    <th>אחוז רווח</th>
-                    <th>מלאי</th>
+                    <th class="sortable" onclick="toggleSort('sku')">מק"ט ${sortIcon('sku')}</th>
+                    <th class="sortable" onclick="toggleSort('name')">שם ${sortIcon('name')}</th>
+                    <th class="sortable" onclick="toggleSort('category')">קטגוריה ${sortIcon('category')}</th>
+                    <th class="sortable" onclick="toggleSort('supplier')">מחיר ספק ${sortIcon('supplier')}</th>
+                    <th class="sortable" onclick="toggleSort('withVat')">+ מע"מ ${sortIcon('withVat')}</th>
+                    <th class="sortable" onclick="toggleSort('salePrice')">מחיר מכירה ${sortIcon('salePrice')}</th>
+                    <th class="sortable" onclick="toggleSort('profit')">רווח ${sortIcon('profit')}</th>
+                    <th class="sortable" onclick="toggleSort('marginPct')">אחוז רווח ${sortIcon('marginPct')}</th>
+                    <th class="sortable" onclick="toggleSort('stock')">מלאי ${sortIcon('stock')}</th>
                     <th>פעולות</th>
                 </tr>
             </thead>
             <tbody>
-                ${filtered.map(rowHtml).join("")}
+                ${sorted.map(rowHtml).join("")}
             </tbody>
         </table>`;
     attachRowDragHandlers();

@@ -184,6 +184,25 @@ a:hover { text-decoration: underline; }
     color: var(--text);
     position: sticky;
     top: 0;
+    user-select: none;
+}
+.admin-table th.sortable {
+    cursor: pointer;
+    transition: background .15s;
+}
+.admin-table th.sortable:hover {
+    background: #ebf4ff;
+    color: var(--primary);
+}
+.sort-icon {
+    font-size: .7rem;
+    opacity: 0.4;
+    margin-right: .25rem;
+    display: inline-block;
+}
+.sort-icon.active {
+    opacity: 1;
+    color: var(--primary);
 }
 .admin-table tr:hover { background: #f8fafc; }
 .admin-table tbody tr[data-sku] { transition: background .15s, outline .15s; cursor: default; }
