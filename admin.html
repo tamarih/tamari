@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול מוצרים</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <h1>ניהול מוצרים</h1>
+        <nav>
+            <a href="index.html">קטלוג</a>
+            <a href="admin.html" class="active">ניהול</a>
+            <a href="#" id="logout-link" style="display:none">יציאה</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Login gate -->
+<div id="auth-gate" class="auth-gate" style="display:none">
+    <h2>כניסה למערכת הניהול</h2>
+    <form id="login-form">
+        <div class="form-field">
+            <label for="login-email">אימייל</label>
+            <input type="email" id="login-email" required>
+        </div>
+        <div class="form-field">
+            <label for="login-password">סיסמה</label>
+            <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">היכנס</button>
+    </form>
+    <p style="margin-top:1rem;font-size:.85rem;color:#718096">
+        משתמש ניהול נוצר ב-Supabase תחת Authentication → Users
+    </p>
+</div>
+
+<!-- Admin panel -->
+<main id="admin-main" class="container" style="display:none">
+
+    <div class="controls">
+        <input type="text" id="search" placeholder="חיפוש לפי שם או מק&quot;ט...">
+        <select id="category-filter">
+            <option value="">כל הקטגוריות</option>
+        </select>
+        <button id="add-btn" class="btn btn-primary">+ הוסף מוצר חדש</button>
+    </div>
+
+    <div id="table-container">
+        <div class="loader">טוען...</div>
+    </div>
+
+</main>
+
+<!-- Product modal -->
+<div class="modal-overlay" id="product-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="modal-title">הוסף מוצר</h2>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="f-sku">מק"ט *</label>
+                        <input type="text" id="f-sku" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="f-name">שם המוצר *</label>
+                        <input type="text" id="f-name" required>
+                    </div>
+
+                    <div class="form-field full">
+                        <label for="f-description">תיאור קצר</label>
+                        <textarea id="f-description"></textarea>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="f-category">קטגוריה</label>
+                        <input type="text" id="f-category" list="cat-list">
+                        <datalist id="cat-list"></datalist>
+                    </div>
+                    <div class="form-field">
+                        <label for="f-image">תמונה</label>
+                        <input type="file" id="f-image" accept="image/*">
+                        <small id="current-image" style="font-size:.8rem;color:#718096;margin-top:.25rem"></small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="f-supplier-price">מחיר ספק (לפני מע"מ) *</label>
+                        <input type="number" id="f-supplier-price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="f-manual-sale-price">
+                            מחיר מכירה ידני (אופציונלי)
+                            <small style="font-weight:400;color:#718096">— ריק = +30% אוטומטי</small>
+                        </label>
+                        <input type="number" id="f-manual-sale-price" step="0.01" min="0" placeholder="להשאיר ריק לחישוב אוטומטי">
+                    </div>
+
+                    <div class="form-field full">
+                        <label>חישוב אוטומטי</label>
+                        <div class="price-preview" id="price-preview">
+                            <span>מחיר כולל מע"מ:</span><strong id="pv-with-vat">₪0.00</strong>
+                            <span>מחיר מכירה:</span><strong id="pv-sale">₪0.00</strong>
+                            <span>רווח בש"ח:</span><strong id="pv-profit">₪0.00</strong>
+                            <span>אחוז רווח בפועל:</span><strong id="pv-margin-pct">0%</strong>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="f-stock">מלאי</label>
+                        <input type="number" id="f-stock" min="0">
+                    </div>
+                    <div class="form-field">
+                        <label for="f-print-area">שטח הדפסה</label>
+                        <input type="text" id="f-print-area" placeholder='למשל: 20 * 9.5 ס"מ'>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="f-press-time">זמן כבישה</label>
+                        <input type="text" id="f-press-time" placeholder="למשל: 180 שניות">
+                    </div>
+                    <div class="form-field">
+                        <label for="f-press-temp">טמפרטורת כבישה</label>
+                        <input type="text" id="f-press-temp" placeholder="למשל: 200°C">
+                    </div>
+
+                    <div class="form-field full">
+                        <label for="f-notes">הערות</label>
+                        <textarea id="f-notes"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="saveProduct()">שמור</button>
+            <button type="button" class="btn btn-ghost" onclick="closeModal()">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/admin.js"></script>
+
+</body>
+</html>

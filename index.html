@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>קטלוג מוצרים - סובלימציה</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <h1>קטלוג מוצרי סובלימציה</h1>
+        <nav>
+            <a href="index.html" class="active">קטלוג</a>
+            <a href="admin.html">ניהול</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+
+    <div class="controls">
+        <input type="text" id="search" placeholder="חיפוש לפי שם מוצר או מק&quot;ט...">
+        <select id="category-filter">
+            <option value="">כל הקטגוריות</option>
+        </select>
+        <span class="results-count" id="results-count">טוען...</span>
+    </div>
+
+    <div id="products-container" class="products-grid">
+        <div class="loader">טוען מוצרים...</div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/catalog.js"></script>
+
+</body>
+</html>
