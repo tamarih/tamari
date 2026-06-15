@@ -98,7 +98,23 @@ function escapeHtml(s) {
     }[c]));
 }
 
-document.getElementById("search").addEventListener("input", applyFilters);
+const searchInput = document.getElementById("search");
+const clearBtn = document.getElementById("clear-search");
+
+function updateClearVisibility() {
+    if (clearBtn) clearBtn.classList.toggle("visible", searchInput.value.length > 0);
+}
+function clearSearch() {
+    searchInput.value = "";
+    document.getElementById("category-filter").value = "";
+    updateClearVisibility();
+    applyFilters();
+    searchInput.focus();
+}
+
+searchInput.addEventListener("input", () => { updateClearVisibility(); applyFilters(); });
+searchInput.addEventListener("keydown", (e) => { if (e.key === "Escape") clearSearch(); });
+if (clearBtn) clearBtn.addEventListener("click", clearSearch);
 document.getElementById("category-filter").addEventListener("change", applyFilters);
 
 loadProducts();

@@ -45,7 +45,10 @@
 <main id="admin-main" class="container" style="display:none">
 
     <div class="controls">
-        <input type="text" id="search" placeholder="חיפוש לפי שם או מק&quot;ט...">
+        <div class="search-wrapper">
+            <input type="text" id="search" placeholder="חיפוש לפי שם או מק&quot;ט...">
+            <button type="button" id="clear-search" class="clear-btn" title="נקה (Esc)" aria-label="נקה חיפוש">×</button>
+        </div>
         <select id="category-filter">
             <option value="">כל הקטגוריות</option>
         </select>

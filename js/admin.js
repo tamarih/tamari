@@ -383,7 +383,23 @@ document.getElementById("f-manual-sale-price").addEventListener("input", updateP
 })();
 
 // ---------- Search/filter ----------
-document.getElementById("search").addEventListener("input", renderTable);
+const searchInput = document.getElementById("search");
+const clearBtn = document.getElementById("clear-search");
+
+function updateClearVisibility() {
+    if (clearBtn) clearBtn.classList.toggle("visible", searchInput.value.length > 0);
+}
+function clearSearch() {
+    searchInput.value = "";
+    document.getElementById("category-filter").value = "";
+    updateClearVisibility();
+    renderTable();
+    searchInput.focus();
+}
+
+searchInput.addEventListener("input", () => { updateClearVisibility(); renderTable(); });
+searchInput.addEventListener("keydown", (e) => { if (e.key === "Escape") clearSearch(); });
+if (clearBtn) clearBtn.addEventListener("click", clearSearch);
 document.getElementById("category-filter").addEventListener("change", renderTable);
 
 // ---------- Helpers ----------

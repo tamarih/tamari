@@ -85,6 +85,35 @@ a:hover { text-decoration: underline; }
     font-family: inherit;
     background: #fff;
 }
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-wrapper input[type="text"] {
+    width: 100%;
+    padding-left: 2.2rem;
+}
+.clear-btn {
+    position: absolute;
+    left: .5rem;
+    background: #cbd5e0;
+    color: white;
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s;
+    padding: 0;
+}
+.clear-btn:hover { background: var(--danger); }
+.clear-btn.visible { display: flex; }
 .controls input[type="text"]:focus, .controls select:focus {
     outline: none;
     border-color: var(--primary);
