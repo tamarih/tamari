@@ -5,8 +5,8 @@
 // Get them from: Supabase Dashboard → Project Settings → API
 // ============================================================
 
-const SUPABASE_URL  = "https://sviudpjkhvfoxmggdlyx.supabase.co";
-const SUPABASE_ANON = "sb_publishable_a94W_Hvm4bDao27bpnAhXQ_u2WF7h7X";
+const SUPABASE_URL  = "https://ymsssxdgufdjwrbraclg.supabase.co";
+const SUPABASE_ANON = "sb_publishable_sFWIFGVvijwmY7cLNbG2-Q_1x85p_po";
 
 // VAT % and margin % — change here if rates change in the future
 const VAT_RATE    = 18;
