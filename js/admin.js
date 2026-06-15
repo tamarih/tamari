@@ -105,6 +105,56 @@ function renderTable() {
                 ${filtered.map(rowHtml).join("")}
             </tbody>
         </table>`;
+    attachRowDragHandlers();
+}
+
+// ---------- Drag & drop image upload onto rows ----------
+function attachRowDragHandlers() {
+    document.querySelectorAll('.admin-table tbody tr[data-sku]').forEach(tr => {
+        tr.addEventListener('dragover', (e) => {
+            // Only react if user is dragging a file
+            if (e.dataTransfer && [...(e.dataTransfer.items || [])].some(it => it.kind === 'file')) {
+                e.preventDefault();
+                tr.classList.add('drag-over');
+            }
+        });
+        tr.addEventListener('dragleave', () => tr.classList.remove('drag-over'));
+        tr.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            tr.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                showToast('אנא גררי קובץ תמונה', 'error');
+                return;
+            }
+            const sku = tr.dataset.sku;
+            const id  = parseInt(tr.dataset.id);
+            tr.classList.add('uploading');
+            try {
+                await uploadImageForProduct(id, sku, file);
+                showToast(`תמונה הועלתה למוצר ${sku}`);
+                await loadProducts();
+            } catch (err) {
+                showToast('שגיאה: ' + err.message, 'error');
+            } finally {
+                tr.classList.remove('uploading');
+            }
+        });
+    });
+}
+
+async function uploadImageForProduct(productId, sku, file) {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = `products/${sku.replace(/[^\w-]/g, '_')}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabaseClient.storage
+        .from('product-images')
+        .upload(path, file, { contentType: file.type, upsert: true });
+    if (upErr) throw upErr;
+    const { data: { publicUrl } } = supabaseClient.storage
+        .from('product-images').getPublicUrl(path);
+    const { error: dbErr } = await supabaseClient
+        .from('products').update({ image_url: publicUrl }).eq('id', productId);
+    if (dbErr) throw dbErr;
 }
 
 function rowHtml(p) {
@@ -114,7 +164,7 @@ function rowHtml(p) {
         : `<div class="thumb"></div>`;
     const marker = prices.isManualPrice ? '<small style="color:#ed8936" title="מחיר ידני">✎</small>' : '';
     return `
-        <tr>
+        <tr data-sku="${escapeHtml(p.sku)}" data-id="${p.id}" title="גררי תמונה לכאן להעלאה מהירה">
             <td>${img}</td>
             <td>${escapeHtml(p.sku)}</td>
             <td>${escapeHtml(p.name)}</td>
