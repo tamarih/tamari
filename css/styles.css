@@ -292,6 +292,17 @@ a:hover { text-decoration: underline; }
     background: #fff;
 }
 .form-field textarea { min-height: 80px; resize: vertical; }
+.image-dropzone {
+    padding: .75rem;
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    background: #fafafa;
+    transition: background .15s, border-color .15s;
+}
+.image-dropzone.drag-over {
+    background: #ebf4ff;
+    border-color: var(--primary);
+}
 .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
     outline: none;
     border-color: var(--primary);

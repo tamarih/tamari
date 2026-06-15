@@ -358,6 +358,30 @@ function updatePricePreview() {
 document.getElementById("f-supplier-price").addEventListener("input", updatePricePreview);
 document.getElementById("f-manual-sale-price").addEventListener("input", updatePricePreview);
 
+// ---------- Drag & drop into the modal image dropzone ----------
+(function setupModalDropzone() {
+    const zone = document.getElementById("image-dropzone");
+    if (!zone) return;
+    zone.addEventListener("dragover", (e) => {
+        if (e.dataTransfer && [...(e.dataTransfer.items || [])].some(it => it.kind === "file")) {
+            e.preventDefault();
+            zone.classList.add("drag-over");
+        }
+    });
+    zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
+    zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (!file || !file.type.startsWith("image/")) return;
+        // Assign the dropped file to the file input via DataTransfer
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        document.getElementById("f-image").files = dt.files;
+        document.getElementById("current-image").textContent = `נבחר: ${file.name}`;
+    });
+})();
+
 // ---------- Search/filter ----------
 document.getElementById("search").addEventListener("input", renderTable);
 document.getElementById("category-filter").addEventListener("change", renderTable);
