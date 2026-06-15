@@ -1,0 +1,5 @@
+data/
+scripts/
+*.txt
+__pycache__/
+*.pyc
